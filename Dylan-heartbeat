@@ -362,7 +362,8 @@ function getLastUserTime(messages) {
       if (parsed) return parsed;
     }
   }
-  return null;
+try { const s = fs.statSync(TIMELINE_PATH);if (s.mtime) return s.mtime; }catch{}
+return null;
 }
 
 function stripPosition(messages) {
