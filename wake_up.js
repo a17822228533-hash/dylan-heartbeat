@@ -18,7 +18,7 @@ function getLastUserTime() {
   try {
     return fs.statSync(TIMELINE_PATH).mtime;
   } catch (_) {}
-  return null;
+  return new Date(0);
 }
 
 setInterval(() => {
