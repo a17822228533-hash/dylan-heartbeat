@@ -87,6 +87,9 @@ async function runWakeUp() {
   const data = await res.json();
   const aiText = (data.choices?.[0]?.message?.content || "").trim();
   console.log("[wake_up] AI回复:", aiText.slice(0, 100));
+console.log("[wake_up] raw:", JSON.stringify(data).slice(0, 200));
+
+
 
   if (!aiText || aiText.startsWith("[NO_ACTION]")) {
     console.log("[wake_up] AI选择不推送");
