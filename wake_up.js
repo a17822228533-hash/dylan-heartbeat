@@ -70,8 +70,8 @@ async function runWakeUp() {
   const wakeMessages = [
     {
       role: "system",
-      content: `${systemMsg}\n\n## 唤醒说明\n当前时间：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}\n距用户最后消息：${diffMinutes} 分钟\n\n这是后台自动唤醒，用户没有发新消息。直接写你想对用户说的话，会作为推送发给她。第一行是标题，第二行是正文。不想说就输出 [NO_ACTION]。`   \n\n如果你有想记下的事，可以在回复末尾用 [DIARY]...[/DIARY] 写一段。不想写就不写。
- },
+      content: `${systemMsg}\n\n## 唤醒说明\n当前时间：${new Date().toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })}\n距用户最后消息：${diffMinutes} 分钟\n\n这是后台自动唤醒，用户没有发新消息。直接写你想对用户说的话，会作为推送发给她。第一行是标题，第二行是正文。不想说就输出 [NO_ACTION]。 \n\n如果你有想记下的事，可以在回复末尾用 [DIARY]...[/DIARY] 写一段。不想写就不写。`
+    },
     {
       role: "user",
       content: `最近的聊天记录供你参考：\n\n${history}`
