@@ -98,9 +98,7 @@ console.log("[wake_up] raw:", JSON.stringify(data).slice(0, 200));
 
   if (!BARK_KEY) { console.log("[wake_up] 缺少 BARK_KEY"); return; }
 
- const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
-if (diaryMatch) {
-    const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
+   const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
   if (diaryMatch) {
     const fs = require("fs");
     const path = require("path");
@@ -110,7 +108,6 @@ if (diaryMatch) {
     const fileName = now.toISOString().slice(0, 19).replace(/[:.]/g, "-") + ".md";
     fs.writeFileSync(path.join(diaryDir, fileName), diaryMatch[1].trim(), "utf-8");
   }
-
 const pushText = aiText.replace(/\[DIARY\][\s\S]*?\[\/DIARY\]/, "").trim();
 if (!pushText) return;
  const lines = pushText.split("\n").filter(l => l.trim());
