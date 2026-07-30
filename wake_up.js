@@ -100,12 +100,17 @@ console.log("[wake_up] raw:", JSON.stringify(data).slice(0, 200));
 
  const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
 if (diaryMatch) {
-  const diaryPath = "./diary.json";
-  let diaryArr = [];
-  try { diaryArr = JSON.parse(require("fs").readFileSync(diaryPath, "utf8")); } catch(e) {}
-  diaryArr.push({ time: new Date().toISOString(), content: diaryMatch[1].trim() });
-  require("fs").writeFileSync(diaryPath, JSON.stringify(diaryArr, null, 2));
-}
+    const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
+  if (diaryMatch) {
+    const fs = require("fs");
+    const path = require("path");
+    const diaryDir = process.env.DIARY_DIR_NAME || "diary";
+    if (!fs.existsSync(diaryDir)) { fs.mkdirSync(diaryDir, { recursive: true }); }
+    const now = new Date();
+    const fileName = now.toISOString().slice(0, 19).replace(/[:.]/g, "-") + ".md";
+    fs.writeFileSync(path.join(diaryDir, fileName), diaryMatch[1].trim(), "utf-8");
+  }
+
 const pushText = aiText.replace(/\[DIARY\][\s\S]*?\[\/DIARY\]/, "").trim();
 if (!pushText) return;
  const lines = pushText.split("\n").filter(l => l.trim());
