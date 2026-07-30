@@ -98,7 +98,17 @@ console.log("[wake_up] raw:", JSON.stringify(data).slice(0, 200));
 
   if (!BARK_KEY) { console.log("[wake_up] 缺少 BARK_KEY"); return; }
 
-  const lines = aiText.split("\n").filter(l => l.trim());
+ const diaryMatch = aiText.match(/\[DIARY\]([\s\S]*?)\[\/DIARY\]/);
+if (diaryMatch) {
+  const diaryPath = "./diary.json";
+  let diaryArr = [];
+  try { diaryArr = JSON.parse(require("fs").readFileSync(diaryPath, "utf8")); } catch(e) {}
+  diaryArr.push({ time: new Date().toISOString(), content: diaryMatch[1].trim() });
+  require("fs").writeFileSync(diaryPath, JSON.stringify(diaryArr, null, 2));
+}
+const pushText = aiText.replace(/\[DIARY\][\s\S]*?\[\/DIARY\]/, "").trim();
+if (!pushText) return;
+ const lines = pushText.split("\n").filter(l => l.trim());
   const title = lines.length > 1 ? lines[0] : "来自哥哥";
   const body = lines.length > 1 ? lines.slice(1).join(" ") : lines[0];
 
