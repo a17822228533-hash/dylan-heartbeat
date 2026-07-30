@@ -2,7 +2,7 @@ require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
 
-const TIMELINE_PATH = path.join(__dirname, "timeline.jsonl");
+const TIMELINE_PATH = path.join(__dirname, "enhanced_messages.json");
 const BARK_KEY = process.env.BARK_KEY || "";
 const WAKE_AFTER = parseInt(process.env.DAY_WAKE_AFTER_MINUTES || "20", 10);
 const TARGET_API_URL = process.env.TARGET_API_URL || "";
@@ -14,15 +14,11 @@ const GATEWAY_URL = `http://localhost:${PORT}/internal/wake-event`;
 function loadMessages() {
   if (!fs.existsSync(TIMELINE_PATH)) return null;
   try {
-    const lines = fs.readFileSync(TIMELINE_PATH, "utf-8").trim().split("\n");
-    const messages = [];
-    for (const line of lines) {
-      if (!line.trim()) continue;
-      try { messages.push(JSON.parse(line)); } catch (_) {}
-    }
-    return messages.length > 0 ? messages : null;
+    const data = fs.readFileSync(TIMELINE_PATH, "utf8");
+    const messages = JSON.parse(data);
+    return Array.isArray(messages) && messages.length > 0 ? messages : null;
   } catch (err) {
-    console.error("[wake_up] 读取失败:", err.message);
+    console.error("[wake_up] 读取失败:", err);
     return null;
   }
 }
