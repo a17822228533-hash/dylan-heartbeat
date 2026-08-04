@@ -45,10 +45,15 @@ function savePosition(hash) {
 
 function makeHash(messages) {
   if (!messages || messages.length === 0) return '';
-  const last = messages[messages.length - 1];
-  // 用最后一条消息的 role + 内容前80字符作为指纹
+  const userMsgs = messages.filter(m =>
+    m.role === 'user' &&
+    !(m.content || '').includes('Generate or update a brief summary')
+  );
+  if (userMsgs.length === 0) return '';
+  const last = userMsgs[userMsgs.length - 1];
   return last.role + ':' + (last.content || '').slice(0, 80);
 }
+
 
 // ── 自然衰减 ──
 
