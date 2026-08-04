@@ -142,6 +142,8 @@ async function runCycle() {
 
 // ── 启动 ──
 console.log('[jiwen] 情绪引擎启动，每5分钟分析一次');
+// 启动时重置位置，确保首次运行会分析
+saveLastPosition(0);
 runCycle(); // 启动时立刻跑一次
 setInterval(runCycle, 5 * 60 * 1000);
 
