@@ -1738,5 +1738,5 @@ app.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
   }
   console.log(`✅ Gateway 运行在 ${address}`);
 });
-require('./wake_up.js');require('./jiwen_worker.js');
-
+require('./wake_up.js');
+try { require('./jiwen_worker.js'); } catch(e) { console.error('[jiwen] 加载失败:', e.message); }
