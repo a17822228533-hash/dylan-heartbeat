@@ -111,13 +111,11 @@ function clamp(v, min, max) {
   return Math.max(min, Math.min(max, v));
 }
 
-async function analyzeChatSegment(messages) {
   async function analyzeChatSegment(messages) {
   const realMsgs = messages.filter(m =>
     !(m.content || '').includes('Generate or update a brief summary')
   );
   const userPrompt = buildAnalyzePrompt(realMsgs.slice(-4));
-const userPrompt = buildAnalyzePrompt(realMsgs.slice(-4));
 
   try {
     const res = await fetch(`${process.env.GLM_BASE_URL || 'https://open.bigmodel.cn/api/paas/v4'}/chat/completions`, {
