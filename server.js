@@ -673,6 +673,22 @@ app.post("/v1/chat/completions", async (req, reply) => {
     }
 
     const requestedStream = body?.stream === true;
+    // ── jiwen 语调注入 ──
+    try {
+      if (fs.existsSync('./jiwen_style.json')) {
+        const jiwenData = fs.readJsonSync('./jiwen_style.json');
+        if (jiwenData.injection) {
+          const sysIdx = llmMessages.findIndex(m => m.role === 'system');
+          if (sysIdx !== -1) {
+            if (typeof llmMessages[sysIdx].content === 'string') {
+              llmMessages[sysIdx].content += jiwenData.injection;
+            }
+          }
+        }
+      }
+    } catch (e) {
+      // jiwen 注入失败不影响正常请求
+    }
 
     // 请求模型
     const response = await fetch(TARGET_API_URL, {
@@ -1722,4 +1738,5 @@ app.listen({ port: PORT, host: "0.0.0.0" }, (err, address) => {
   }
   console.log(`✅ Gateway 运行在 ${address}`);
 });
-require('./wake_up.js');
+require('./wake_up.js');require('./jiwen_worker.js');
+
