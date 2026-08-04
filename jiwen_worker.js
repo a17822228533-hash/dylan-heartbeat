@@ -29,17 +29,25 @@ function saveState(state) {
   fs.writeJsonSync(STATE_FILE, state, { spaces: 2 });
 }
 
-function loadLastPosition() {
+function getLastHash() {
   try {
     if (fs.existsSync(POSITION_FILE)) {
-      return fs.readJsonSync(POSITION_FILE).lastIndex || 0;
+      const data = fs.readJsonSync(POSITION_FILE);
+      return data.hash || '';
     }
   } catch (e) {}
-  return 0;
+  return '';
 }
 
-function saveLastPosition(index) {
-  fs.writeJsonSync(POSITION_FILE, { lastIndex: index, updatedAt: new Date().toISOString() });
+function savePosition(hash) {
+  fs.writeJsonSync(POSITION_FILE, { hash, updatedAt: new Date().toISOString() });
+}
+
+function makeHash(messages) {
+  if (!messages || messages.length === 0) return '';
+  const last = messages[messages.length - 1];
+  // 用最后一条消息的 role + 内容前80字符作为指纹
+  return last.role + ':' + (last.content || '').slice(0, 80);
 }
 
 // ── 自然衰减 ──
@@ -92,20 +100,26 @@ function buildInjection(state) {
 async function runCycle() {
   try {
     // 1. 读 timeline
-    if (!fs.existsSync(TIMELINE_FILE)) return;
+    if (!fs.existsSync(TIMELINE_FILE)) {
+      console.log('[jiwen] timeline文件不存在，跳过');
+      return;
+    }
     const timeline = fs.readJsonSync(TIMELINE_FILE);
 
     // 只取 user 和 assistant 的真实消息（排除 system）
     const messages = timeline.filter(m => m.role === 'user' || m.role === 'assistant');
 
-    // 2. 对比上次分析位置
-    const lastPos = loadLastPosition();
-    if (messages.length <= lastPos) {
+    // 2. 用hash判断是否有新消息
+    const currentHash = makeHash(messages);
+    const lastHash = getLastHash();
+
+    if (currentHash === lastHash) {
       // 没有新消息，只做衰减
       let state = loadState();
       state = tick(state, 5);
       saveState(state);
       fs.writeJsonSync(STYLE_FILE, { injection: buildInjection(state), state, updatedAt: new Date().toISOString() }, { spaces: 2 });
+      console.log('[jiwen] 无新消息，衰减完成');
       return;
     }
 
@@ -127,8 +141,8 @@ async function runCycle() {
     state = applyDelta(state, delta);
     saveState(state);
 
-    // 6. 更新位置
-    saveLastPosition(messages.length);
+    // 6. 更新hash
+    savePosition(currentHash);
 
     // 7. 写 style 文件
     const injection = buildInjection(state);
@@ -142,8 +156,8 @@ async function runCycle() {
 
 // ── 启动 ──
 console.log('[jiwen] 情绪引擎启动，每5分钟分析一次');
-// 启动时重置位置，确保首次运行会分析
-saveLastPosition(0);
+// 启动时清空hash，确保首次运行会分析
+savePosition('');
 runCycle(); // 启动时立刻跑一次
 setInterval(runCycle, 5 * 60 * 1000);
 
