@@ -40,7 +40,7 @@ function getLastUserTime(messages) {
     }
   }
   try { return fs.statSync(TIMELINE_PATH).mtime; } catch (_) {}
-  return new Date(0);
+  return new Date(）;
 }
 
 async function runWakeUp() {
